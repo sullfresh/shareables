@@ -1,0 +1,97 @@
+---
+title: "Atlas of Urban expansion"
+output: html_notebook
+dataset: http://www.atlasofurbanexpansion.org/data -> Tables -> "Areas and Densities"
+about: The Atlas of Urban Expansion is a database created by NYU Stern Business School, United Nations Human Settlements Programme, and Lincoln Institute of Land Policy. The Areas and Densities dataset consists of city sprawl, land use and population density data taken for 200 sampled cities at 3 different time periods: t1 (late 80s/early 90s), t2 (early 2000s), and t3 (mid-2010s). Data was collected from satelite imagery, population data, and digitized historical maps. 
+---
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+#download libraries
+library(markdown)
+library(tidyverse)
+library(readr)
+
+#read in the dataset. be sure it's saved to working directory.
+city_data <- read_csv("Areas_and_Densities_Table_1.csv")
+
+#get glimpse of dataset rows and columns. 
+glimpse(city_data)
+#we see the first row for most columns are variable names, not data.
+#look at all the variable (column) names, # of cols and # of rows
+names(city_data)
+# some column names are strings w/ numbers "...nn"
+ncol(city_data) 
+# 79 columns
+nrow(city_data)
+# 201 rows
+
+#create smaller table to work with
+colnames <- colnames(city_data)
+city_data_new <- city_data %>%
+  select(colnames[c(1:16, 37:40)])
+
+#rename variables
+new_colnames <- c("city_name", "country", "region", "latitude", "longitude", "t1", "t2", "t3", "pop_t1",                       "pop_t2","pop_t3", "pop_t2t3", "area_total_t1", "area_total_t2", "area_total_t3",                            "area_total_t2t3","density_t1", "density_t2", "density_t3", "density_t2t3")
+colnames(city_data_new) <- new_colnames
+
+#remove first row of data containing old column name info & change columns to numeric
+city_data_new <- city_data_new[-1,] %>%
+  mutate(pop_t1 = gsub(",", "", pop_t1)) %>%
+  mutate(pop_t1 = as.numeric(pop_t1)) %>%
+  mutate(pop_t2 = gsub(",", "", pop_t2)) %>%
+  mutate(pop_t2 = as.numeric(pop_t2)) %>%
+  mutate(pop_t3 = gsub(",", "", pop_t3)) %>%
+  mutate(pop_t3 = as.numeric(pop_t3)) %>%
+  mutate(pop_t2t3 = gsub("%", "", pop_t2t3)) %>%
+  mutate(pop_t2t3 = as.numeric(pop_t2t3)) %>%
+  mutate(area_total_t2t3 = gsub("%", "", area_total_t2t3)) %>%
+  mutate(area_total_t2t3 = as.numeric(area_total_t2t3)) %>%
+  mutate(density_t2t3 = gsub("%", "", density_t2t3)) %>%
+  mutate(density_t2t3 = as.numeric(density_t2t3))
+  
+#create dataset of top 10 fastest growing populations t2-t3
+city_data_pop <- city_data_new %>%
+  arrange(pop_t2t3) %>%
+  select(city_name, country, region, pop_t2t3, area_total_t2t3) %>%
+  filter(pop_t2t3 > 7.9)
+#create bar graph of top population growth cities, compare to area growth
+city_data_pop %>%
+  ggplot(aes(x = city_name, y = pop_t2t3)) +
+  geom_col()
+
+#subset data to East Asia and Europe regions
+city_data_asia_europe <- city_data_new %>%
+  filter(
+         region %in% c("East Asia and the Pacific","Europe and Japan", "Southeast Asia") 
+         )
+#create scatterplot to show population change between t1 and t3
+city_data_asia_europe %>%
+  ggplot(aes(x = pop_t1, y = pop_t3, color = region)) +
+  geom_point() + 
+  labs(
+      title = "Population Counts of Global Cities: 25 Years of Change (Select Regions)",
+      x = "Population 1990",
+      y = "Population 2014"
+  ) +
+  scale_color_manual(
+    name = "Region",
+    values = c("darkgreen", "orchid", "orange")
+  ) +
+  scale_x_continuous(
+  breaks = seq(100000, 30000000, 5000000),
+  minor_breaks = NULL
+  ) +
+  scale_y_continuous(
+  breaks = seq(100000, 50000000, 5000000),
+  minor_breaks = NULL
+  ) +
+  theme(panel.background = element_rect(fill = "white"))
+
+
+
+
+
+
+
+
+
+
