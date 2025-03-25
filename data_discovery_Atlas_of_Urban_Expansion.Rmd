@@ -2,7 +2,7 @@
 title: "Atlas of Urban expansion"
 output: html_notebook
 dataset: http://www.atlasofurbanexpansion.org/data -> Tables -> "Areas and Densities"
-about: The Atlas of Urban Expansion is a database created by NYU Stern Business School, United Nations Human Settlements Programme, and Lincoln Institute of Land Policy. The Areas and Densities dataset consists of city sprawl, land use and population density data taken for 200 sampled cities at 3 different time periods: t1 (late 80s/early 90s), t2 (early 2000s), and t3 (mid-2010s). Data was collected from satelite imagery, population data, and digitized historical maps. 
+about: The Atlas of Urban Expansion is a database created by NYU Stern Business School, United Nations Human Settlements Programme, and Lincoln Institute of Land Policy. 
 ---
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 #download libraries
